@@ -12,7 +12,7 @@ def post_on_wall():
 
 
 def main():
-    ACCESS_TOKEN = "EAACEdose0cBAGiBHooWqZAeyO7jZAXmdZAuOvSUnqHAXYQIlHmrOITOkavou6TMrfmtlg5aOfdoy1Pdgb2kEZB8U8kPZAvMQwmNUIHFgvpMh4E4aG8sTKVYJMC36DRb5o8ZCzrM8jZAZBlptKun2RkprMznYMc7INVXFjJt53lfAGEDeFC5koCzd2as84aEjEekJy3K2RmbkA5XG3ZCfZC76A"
+    ACCESS_TOKEN = "Insert Access Token"
     base_url = "https://graph.facebook.com/me/friends"
     url = "https://graph.facebook.com/fql"
     para = {"access_token" : ACCESS_TOKEN}
