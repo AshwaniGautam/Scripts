@@ -1,16 +1,46 @@
 from facepy import GraphAPI
-import datetime
+import datetime, time
 
-Access_Token = "Insert-Your-Access_Token"
-graph = GraphAPI(Access_Token)
-Deadline = (datetime.datetime.utcnow()-datetime.timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
-Lower_Bound = (datetime.datetime.utcnow()-datetime.timedelta(minutes=500)).strftime("%Y-%m-%dT%H:%M:%S")
+def get_key(item):
+    return item['created_time']
 
-Group_Handle = graph.get("1121167991289664/feed?since="+Lower_Bound+"&until="+Deadline)
-for post in Group_Handle['data']:
-    if post.has_key('message' or 'story'):
-        if len(graph.get(str(post['id'])+'/likes')['data']) <= 20:
-            graph.post(str(post['id'])+"/comments", message='kdkd')
+def change_creation_time():
+
+    for post in posts:
+
+        post_time = post['created_time'].split('+')[0]
+        created_time = time.mktime(datetime.datetime.strptime(post_time, "%Y-%m-%dT%H:%M:%S").timetuple())
+        post['created_time'] = created_time
 
 
+Access_Token = "Your_Access_Token"
+graph = GraphAPI(Access_Token, version='2.9')
 
+while 1:
+
+    posts = graph.get("Group-ID/feed?fields=created_time,reactions,message&limit=100")['data']
+    flag = 0
+    Deadline = time.time() - 6*3600  # carefull change according to timezone
+    Lower_Bound = time.time() - 7*3600
+
+    while 1:
+
+        change_creation_time()
+        posts.sort(key=get_key, reverse=True)
+
+        for post in posts:
+
+            if Lower_Bound <= post['created_time']:
+                if post['created_time'] < Deadline:
+                    if len(post['reactions']['data']) < 5:
+                        graph.delete(str(post['id']))
+            else:
+                flag = 1
+                time.sleep(480)
+                break
+        if flag:
+            break
+
+        if 'paging' in Group_Handle and 'next' in Group_Handle['paging']:
+            request_str = Group_Handle['paging']['next'].replace('https://graph.facebook.com/v2.9', '')
+            Group_Handle = graph.get(request_str)
